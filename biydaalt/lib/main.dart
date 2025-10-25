@@ -2,11 +2,60 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
+import 'package:introduction_screen/introduction_screen.dart';
 
 void main() {
   runApp(const MyApp());
 }
+class IntroPage extends StatelessWidget {
+  const IntroPage({super.key});
 
+  @override
+  Widget build(BuildContext context) {
+    return IntroductionScreen(
+      pages: [
+        PageViewModel(
+          title: "Сайн байна уу!",
+          body: "Энэ бол миний Flutter апп танилцуулга хуудас.",
+          image: Center(child: Image.asset('assets/intro.jpg', height: 200)),
+          decoration: const PageDecoration(
+            titleTextStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            bodyTextStyle: TextStyle(fontSize: 18),
+          ),
+        ),
+        PageViewModel(
+          title: "Хобби болон мэдээ",
+          body: "Миний хобби болон бусад мэдээллийг эндээс харах боломжтой.",
+          image: Center(child: Image.asset('assets/intro.jpg', height: 200)),
+        ),
+        PageViewModel(
+          title: "Эцсийн хуудас",
+          body: "Нэвтрэх товчийг дарж системд орно уу.",
+          image: Center(child: Image.asset('assets/intro.jpg', height: 200)),
+        ),
+      ],
+      onDone: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      },
+      onSkip: () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MainPage()),
+        );
+      },
+      showSkipButton: true,
+      skip: const Text("Алгасах"),
+      next: const Icon(Icons.arrow_forward),
+      done: const Text("Эхлэх", style: TextStyle(fontWeight: FontWeight.w600)),
+      dotsDecorator: const DotsDecorator(
+        activeColor: Colors.blueAccent,
+      ),
+    );
+  }
+}
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -19,7 +68,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      home: const MainPage(),
+      home: const IntroPage(),
     );
   }
 }
