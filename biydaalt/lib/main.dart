@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Биедаалт №1',
+      title: 'Бие даалт №1',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.poppinsTextTheme(),
@@ -62,9 +62,7 @@ class _MainPageState extends State<MainPage> {
   }
 }
 
-//
-// -------------- 1-р хуудас: НЭВТРЭХ ХУУДАС -----------------
-//
+// -------------- 1r huudas -----------------
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -81,12 +79,13 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       body: Center(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(20.0),
           child: Card(
-            elevation: 4,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 5,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
             child: Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -95,15 +94,22 @@ class _LoginPageState extends State<LoginPage> {
                   CircleAvatar(
                     radius: 45,
                     backgroundColor: Colors.blue.shade200,
-                    child: const Icon(Icons.person, size: 50, color: Colors.white),
+                    child: const Icon(
+                      Icons.person,
+                      size: 50,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 20),
                   Text(
                     "Системд нэвтрэх",
                     style: GoogleFonts.poppins(
-                        fontSize: 22, fontWeight: FontWeight.bold),
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                    ),
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 20),
                   TextField(
                     controller: emailController,
                     decoration: const InputDecoration(
@@ -125,9 +131,18 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
                   ElevatedButton.icon(
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text("Тавтай морил, ${emailController.text}!"),
-                      ));
+                      final name = emailController.text.trim();
+                      if (name.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Имэйлээ оруулна уу!"),
+                          ),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Тавтай морил, $name!")),
+                        );
+                      }
                     },
                     icon: const Icon(Icons.login),
                     label: const Text("Нэвтрэх"),
@@ -147,60 +162,68 @@ class _LoginPageState extends State<LoginPage> {
   }
 }
 
-// -------------- 2-r huudas -----------------
+// -------------- 2r huudas -----------------
 class HobbyPage extends StatelessWidget {
   const HobbyPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Миний Хобби"),
+        title: const Text("Миний хобби"),
         backgroundColor: Colors.blueAccent,
+        centerTitle: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Hero(
-              tag: "profile",
-              child: CircleAvatar(
-                radius: 60,
-                backgroundImage: AssetImage('assets/profile.png'),
-              ),
+            CircleAvatar(
+              radius: 60,
+              backgroundImage: const AssetImage('assets/profile.png'),
             ),
             const SizedBox(height: 15),
             Text(
               "Сумъяабазар Даваахүү",
-              style:
-                  GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold),
+              style: GoogleFonts.poppins(
+                  fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            RichText(
-              text: TextSpan(
-                style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
-                children: const [
-                  TextSpan(text: "Миний хобби бол "),
-                  TextSpan(
-                      text: "Хөгжим сонсох, код бичих, шүлэг эсвэл толгой доторхоо бичих, алхах ",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(text: "юм. Мандах МТС их сургуулийн 3р курсэд суралцдаг."),
-                ],
-              ),
+            Text(
+              "Мандах МТС — 3-р курсийн оюутан. Миний хобби бол хипхоп хөгжим сонсох, код бичих, шүлэг бичих, алхах юм.",
+              style: GoogleFonts.poppins(fontSize: 16),
+              textAlign: TextAlign.center,
+
             ),
-            const SizedBox(height: 20),
+        
+            const SizedBox(height: 25),
             Row(
               children: [
-                Flexible(
+                Expanded(
                   child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        Image.asset('assets/hobby1.jpeg', fit: BoxFit.cover, height: 390, width: 500, ),
-                        const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(  "Би чөлөөт цагаараа сагс тоглох дуртай мөн би NBA буюу АНУ үндэсний сагсны лигийг үзэх маш их дуртай."),
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12)),
+                          child: Image.asset(
+                            'assets/hobby1.jpeg',
+                            fit: BoxFit.cover,
+                            height: 200,
+                            width: double.infinity,
+                          ),
                         ),
-                        
+                        const Padding(
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(
+                            "Сагсан бөмбөг үзэх, тоглох дуртай. NBA үзэх маш их дуртай.",
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -208,19 +231,34 @@ class HobbyPage extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                     child: Column(
                       children: [
-                        Image.asset('assets/hobby2.jpeg', fit: BoxFit.cover, height: 390, width: 500,),
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(12)),
+                          child: Image.asset(
+                            'assets/hobby2.jpeg',
+                            fit: BoxFit.cover,
+                            height: 200,
+                            width: double.infinity,
+                          ),
+                        ),
                         const Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text("Яагаад ч юм яварваа нэгэн толгойд орхоор юм бичмээр санагддаг магадгүй өөрөө байнга ишлэл уншдаг болохоор байх."),
+                          padding: EdgeInsets.all(10.0),
+                          child: Text(
+                            "Толгойдоо орж ирсэн санаагаа бичих дуртай. Энэ нь надад амар тайван мэдрэмж төрүүлдэг.",
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ],
                     ),
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -228,7 +266,7 @@ class HobbyPage extends StatelessWidget {
   }
 }
 
-// -------------- 3-r huudas -----------------
+// -------------- 3r huudas -----------------
 class ExtraPage extends StatelessWidget {
   const ExtraPage({super.key});
 
@@ -238,32 +276,47 @@ class ExtraPage extends StatelessWidget {
       backgroundColor: Colors.deepPurple.shade50,
       appBar: AppBar(
         backgroundColor: Colors.deepPurple,
-        title: const Text("Шинэлэг хуудас"),
+        title: const Text("3-р хуудас"),
+        centerTitle: true,
       ),
-      body: Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            Lottie.asset('assets/animation.json', height: 200),
-            const SizedBox(height: 20),
-            SelectableText(
-              "Энэ бол Lottie animation, Hero, InteractiveViewer ашигласан шинэлэг хуудас юм!",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(
-                  fontSize: 18, fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 20),
-            Expanded(
-              child: InteractiveViewer(
-                panEnabled: true,
-                minScale: 0.8,
-                maxScale: 3,
-                child: Image.asset('assets/nature.webp'),
+      body: SingleChildScrollView(
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 30),
+              SizedBox(
+                height: 200,
+                child: Lottie.asset('assets/animation.json'),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: SelectableText(
+                  "Энэ хуудсанд Lottie animation болон InteractiveViewer ашиглав.",
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.poppins(
+                      fontSize: 18, fontWeight: FontWeight.w500),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 300, 
+                child: InteractiveViewer(
+                  panEnabled: true,
+                  minScale: 0.8,
+                  maxScale: 3,
+                  child: Image.asset('assets/nature.webp'),
+                ),
+              ),
+              const SizedBox(height: 30),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
