@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,116 +10,260 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
+      title: 'Биедаалт №1',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        primarySwatch: Colors.blue,
+        textTheme: GoogleFonts.poppinsTextTheme(),
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MainPage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class MainPage extends StatefulWidget {
+  const MainPage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _MainPageState extends State<MainPage> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  final List<Widget> _pages = const [
+    LoginPage(),
+    HobbyPage(),
+    ExtraPage(),
+  ];
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: ConvexAppBar(
+        backgroundColor: Colors.blueAccent,
+        items: const [
+          TabItem(icon: Icons.login, title: 'Нэвтрэх'),
+          TabItem(icon: Icons.favorite, title: 'Хобби'),
+          TabItem(icon: Icons.auto_awesome, title: 'Шинэ'),
+        ],
+        initialActiveIndex: _selectedIndex,
+        onTap: (int i) {
+          setState(() {
+            _selectedIndex = i;
+          });
+        },
+      ),
+    );
+  }
+}
+
+//
+// -------------- 1-р хуудас: НЭВТРЭХ ХУУДАС -----------------
+//
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.blue.shade50,
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Card(
+            elevation: 4,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 45,
+                    backgroundColor: Colors.blue.shade200,
+                    child: const Icon(Icons.person, size: 50, color: Colors.white),
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    "Системд нэвтрэх",
+                    style: GoogleFonts.poppins(
+                        fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    controller: emailController,
+                    decoration: const InputDecoration(
+                      labelText: "Имэйл",
+                      prefixIcon: Icon(Icons.email),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: passwordController,
+                    obscureText: true,
+                    decoration: const InputDecoration(
+                      labelText: "Нууц үг",
+                      prefixIcon: Icon(Icons.lock),
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        content: Text("Тавтай морил, ${emailController.text}!"),
+                      ));
+                    },
+                    icon: const Icon(Icons.login),
+                    label: const Text("Нэвтрэх"),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 50),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// -------------- 2-r huudas -----------------
+class HobbyPage extends StatelessWidget {
+  const HobbyPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: const Text("Миний Хобби"),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Hero(
+              tag: "profile",
+              child: CircleAvatar(
+                radius: 60,
+                backgroundImage: AssetImage('assets/profile.png'),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Text(
+              "Сумъяабазар Даваахүү",
+              style:
+                  GoogleFonts.poppins(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            RichText(
+              text: TextSpan(
+                style: GoogleFonts.poppins(fontSize: 16, color: Colors.black87),
+                children: const [
+                  TextSpan(text: "Миний хобби бол "),
+                  TextSpan(
+                      text: "Хөгжим сонсох, код бичих, шүлэг эсвэл толгой доторхоо бичих, алхах ",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(text: "юм. Мандах МТС их сургуулийн 3р курсэд суралцдаг."),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Flexible(
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Image.asset('assets/hobby1.jpeg', fit: BoxFit.cover, height: 390, width: 500, ),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text(  "Би чөлөөт цагаараа сагс тоглох дуртай мөн би NBA буюу АНУ үндэсний сагсны лигийг үзэх маш их дуртай."),
+                        ),
+                        
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Card(
+                    child: Column(
+                      children: [
+                        Image.asset('assets/hobby2.jpeg', fit: BoxFit.cover, height: 390, width: 500,),
+                        const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("Яагаад ч юм яварваа нэгэн толгойд орхоор юм бичмээр санагддаг магадгүй өөрөө байнга ишлэл уншдаг болохоор байх."),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// -------------- 3-r huudas -----------------
+class ExtraPage extends StatelessWidget {
+  const ExtraPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.deepPurple.shade50,
+      appBar: AppBar(
+        backgroundColor: Colors.deepPurple,
+        title: const Text("Шинэлэг хуудас"),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          children: [
+            const SizedBox(height: 30),
+            Lottie.asset('assets/animation.json', height: 200),
+            const SizedBox(height: 20),
+            SelectableText(
+              "Энэ бол Lottie animation, Hero, InteractiveViewer ашигласан шинэлэг хуудас юм!",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.poppins(
+                  fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 20),
+            Expanded(
+              child: InteractiveViewer(
+                panEnabled: true,
+                minScale: 0.8,
+                maxScale: 3,
+                child: Image.asset('assets/nature.webp'),
+              ),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
