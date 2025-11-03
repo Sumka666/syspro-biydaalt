@@ -152,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                   const SizedBox(height: 20),
                   Text(
                     "Системд нэвтрэх",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.poppins(  
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.blueAccent,
@@ -220,8 +220,10 @@ class HobbyPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Миний хобби"),
-        backgroundColor: Colors.blueAccent,
+        
+        title: const Text ("Миний хобби", style: TextStyle(color: Colors.white),), 
+        
+        backgroundColor: Colors.blue,
         centerTitle: true,
       ),
       body: SingleChildScrollView(
