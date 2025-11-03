@@ -3,6 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
 
 void main() {
   runApp(const MyApp());
@@ -84,7 +87,7 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = const [
-    LoginPage(),
+    AuthPage(),
     HobbyPage(),
     ExtraPage(),
   ];
@@ -112,100 +115,225 @@ class _MainPageState extends State<MainPage> {
 }
 
 // -------------- 1r huudas -----------------
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+
+class AuthPage extends StatefulWidget {
+  const AuthPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AuthPage> createState() => _AuthPageState();
 }
+class _AuthPageState extends State<AuthPage> with SingleTickerProviderStateMixin {
+  late TabController _tabController;
 
-class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
+  // Login controllers
+  final loginEmail = TextEditingController();
+  final loginPassword = TextEditingController();
+
+  // Register controllers
+  final regName = TextEditingController();
+  final regEmail = TextEditingController();
+  final regPassword = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    loginEmail.dispose();
+    loginPassword.dispose();
+    regName.dispose();
+    regEmail.dispose();
+    regPassword.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    final email = loginEmail.text.trim();
+    final password = loginPassword.text.trim();
+
+    if (email.isEmpty || password.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Имэйл болон нууц үгээ оруулна уу!")),
+      );
+      return;
+    }
+
+    try {
+      final url = Uri.parse('http://localhost:3000/api/login');
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Амжилттай нэвтэрлээ')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Сервертэй холбогдож чадсангүй.")),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Алдаа гарлаа: $e")),
+      );
+    }
+  }
+
+  Future<void> _register() async {
+    final name = regName.text.trim();
+    final email = regEmail.text.trim();
+    final password = regPassword.text.trim();
+
+    if (name.isEmpty || email.isEmpty || password.isEmpty) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Бүх талбарыг бөглөнө үү!")),
+      );
+      return;
+    }
+
+    try {
+      final url = Uri.parse('http://localhost:3000/api/register');
+      final response = await http.post(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({"name": name, "email": email, "password": password}),
+      );
+
+      if (!mounted) return;
+
+      if (response.statusCode == 201) {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Амжилттай бүртгэгдлээ')),
+        );
+        // Бүртгэл амжилттай бол Login tab руу шилжих
+        _tabController.animateTo(0);
+      } else {
+        final data = jsonDecode(response.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(data['message'] ?? 'Алдаа гарлаа')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Алдаа гарлаа: $e")),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue.shade50,
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: Card(
-            elevation: 5,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircleAvatar(
-                    radius: 45,
-                    backgroundColor: Colors.blue.shade200,
-                    child: const Icon(
-                      Icons.person,
-                      size: 50,
-                      color: Colors.white,
-                    ),
+      appBar: AppBar(
+        title: const Text("Auth App"),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: "Login"),
+            Tab(text: "Register"),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          // ===== Login Page =====
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                TextField(
+                  controller: loginEmail,
+                  decoration: const InputDecoration(
+                    labelText: "Имэйл",
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 20),
-                  Text(
-                    "Системд нэвтрэх",
-                    style: GoogleFonts.poppins(  
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
-                    ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: loginPassword,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: "Нууц үг",
+                    prefixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(),
                   ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: emailController,
-                    decoration: const InputDecoration(
-                      labelText: "Имэйл",
-                      prefixIcon: Icon(Icons.email),
-                      border: OutlineInputBorder(),
-                    ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _login,
+                  icon: const Icon(Icons.login),
+                  label: const Text("Нэвтрэх"),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
                   ),
-                  const SizedBox(height: 10),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: "Нууц үг",
-                      prefixIcon: Icon(Icons.lock),
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      final name = emailController.text.trim();
-                      if (name.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Имэйлээ оруулна уу!"),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Тавтай морил, $name!")),
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.login),
-                    label: const Text("Нэвтрэх"),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 50),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ),
+
+          // ===== Register Page =====
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const SizedBox(height: 20),
+                TextField(
+                  controller: regName,
+                  decoration: const InputDecoration(
+                    labelText: "Нэр",
+                    prefixIcon: Icon(Icons.person),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: regEmail,
+                  decoration: const InputDecoration(
+                    labelText: "Имэйл",
+                    prefixIcon: Icon(Icons.email),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: regPassword,
+                  obscureText: true,
+                  decoration: const InputDecoration(
+                    labelText: "Нууц үг",
+                    prefixIcon: Icon(Icons.lock),
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton.icon(
+                  onPressed: _register,
+                  icon: const Icon(Icons.app_registration),
+                  label: const Text("Бүртгүүлэх"),
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(double.infinity, 50),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
